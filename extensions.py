@@ -1,7 +1,7 @@
 import subprocess
 
 from functools import wraps
-from os.path import splitext, join
+import os
 
 extensions = {}
 
@@ -32,7 +32,7 @@ def coffee(filename, data):
     if process.returncode:
         return None, err
     else:
-        _,ext = splitext(filename)
+        _, ext = os.path.splitext(filename)
         dest = filename.replace(ext, '.js')
         return dest, out
 
@@ -40,7 +40,7 @@ def coffee(filename, data):
 def dest(filename, data):
     destination = dest.settings.get('destination')
     if destination:
-        filename = join(destination, filename)
+        filename = os.path.join(destination, tail)
 
     fo = open(filename, 'w')
     fo.write(data)
