@@ -18,7 +18,7 @@ class Watcher(Thread, ReloaderLoop):
     def run(self):
         times = {}
         while not self._Thread__stopped:
-            for filename in self.static.findFiles(self.path):
+            for filename in self.static.findFiles(*self.paths):
                 try:
                     currtime = os.stat(filename).st_mtime
                 except OSError:
