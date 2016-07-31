@@ -49,7 +49,7 @@ class Static(object):
 
     def task(self, name):
         def decorator(f):
-            self.tasks[name] = Task(f)
+            self.tasks[name] = Task(f, [])
         return decorator
 
     def watch(self, path, *tasks):
