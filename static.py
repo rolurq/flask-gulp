@@ -23,7 +23,6 @@ class Static(object):
 
     def init_app(self, app):
         self.app = app
-        self.root_path = app.root_path
 
         @app.context_processor
         def context_processor():
@@ -60,8 +59,8 @@ class Static(object):
             raise ValueError('You should pass a valid application')
         wildcards = [re.compile(r) for r in paths]
 
-        for dirpath, _, filenames in os.walk(self.root_path):
-            rpath = os.path.relpath(dirpath, self.root_path)
+        for dirpath, _, filenames in os.walk(self.app.root_path):
+            rpath = os.path.relpath(dirpath, self.app.root_path)
             # TODO: delete unnecesary directories
             for f in filenames:
                 for reg in wildcards:
