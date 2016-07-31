@@ -25,5 +25,5 @@ class Watcher(Thread, ReloaderLoop):
                 oldtime = times.get(filename)
                 if oldtime and currtime > oldtime:
                     self.static.run(*self.tasks)
-                times[filename] = mtime
+                times[filename] = currtime
             self._sleep(self.interval)
