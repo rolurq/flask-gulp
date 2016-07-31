@@ -23,7 +23,7 @@ class Static(object):
 
     def init_app(self, app):
         app.config.setdefault('STATIC_WATCHER_INTERVAL', 2)
-        app.config.setdefault('STATIC_INITIAL_PATH', self.app.root_path)
+        app.config.setdefault('STATIC_INITIAL_PATH', app.root_path)
         self.app = app
 
         @app.context_processor
