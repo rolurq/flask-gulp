@@ -25,6 +25,7 @@ class Static(object):
         app.config.setdefault('STATIC_WATCHER_INTERVAL', 2)
         app.config.setdefault('STATIC_INITIAL_PATH', app.root_path)
         app.config.setdefault('STATIC_GENERATED_LINKS_PATH', app.static_folder)
+        app.config.setdefault('STATIC_RUN_ON_REFRESH', True)
         self.app = app
 
         @app.context_processor
@@ -46,15 +47,20 @@ class Static(object):
                 """
                     Create links to style files using results from task
                 """
+                run_tasks = self.app.config.get('STATIC_RUN_ON_REFRESH')
+
                 # run unwatched tasks
-                self.run(*(task for task in tasks
-                           if not self.tasks[task].watched))
+                if run_tasks:
+                    self.run(*(task for task in tasks
+                               if not self.tasks[task].watched))
                 return build_html('<link rel="stylesheet" href="%s"/>', *tasks)
 
             def js(*tasks, **options):
                 """
                     Create links to script files using results from task
                 """
+                run_tasks = self.app.config.get('STATIC_RUN_ON_REFRESH')
+
                 options.setdefault('defer', False)
                 options.setdefault('asynchro', False)
                 attrs = ['src="%s"']
@@ -64,8 +70,9 @@ class Static(object):
                     attrs.append('async')
 
                 # run unwatched tasks
-                self.run(*(task for task in tasks
-                           if not self.tasks[task].watched))
+                if run_tasks:
+                    self.run(*(task for task in tasks
+                               if not self.tasks[task].watched))
                 return build_html("<script %s></script>" % ' '.join(attrs),
                                   *tasks)
 
