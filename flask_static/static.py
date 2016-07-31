@@ -9,7 +9,7 @@ from itertools import cycle
 from flask_static.watcher import Watcher
 from flask_static.extensions import extensions
 
-Task = namedtuple('Task', ['function', 'items'])
+Task = namedtuple('Task', ['function', 'items', 'watched'])
 
 
 class Static(object):
@@ -39,8 +39,9 @@ class Static(object):
                 """
                     Create links to style files using results from task
                 """
-                if not self.app.debug:
-                    self.run(*tasks)
+                # run unwatched tasks
+                self.run((task for task in tasks
+                          if not self.tasks[task].watched))
                 return build_html('<link rel="stylesheet" href="%s"/>', *tasks)
 
             def js(*tasks, **options):
@@ -54,8 +55,10 @@ class Static(object):
                     attrs.append('defer')
                 if options['asynchro']:
                     attrs.append('async')
-                if not self.app.debug:
-                    self.run(*tasks)
+
+                # run unwatched tasks
+                self.run((task for task in tasks
+                          if not self.tasks[task].watched))
                 return build_html("<script %s></script>" % ' '.join(attrs),
                                   *tasks)
 
@@ -70,7 +73,7 @@ class Static(object):
             the pipeline.
         """
         def decorator(f):
-            self.tasks[name] = Task(f, [])
+            self.tasks[name] = Task(function=f, items=None, watched=False)
 
             def wrapper(*args, **kwargs):
                 return f(*args, **kwargs)
