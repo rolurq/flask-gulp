@@ -111,7 +111,8 @@ class Static(object):
             t.function.__globals__.update(extensions)
             t.function.__globals__['src'] = src
             t.function()
-            t.items.extend((filename for filename, _ in res))
+            self.tasks[task] = t._replace(items=(filename
+                                                 for filename, _ in res))
             # retrieve normal scope
             del t.function.__globals__['src']
             for k in extensions:
