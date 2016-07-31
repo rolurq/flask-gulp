@@ -4,7 +4,6 @@ import os
 from jinja2 import Markup
 from flask import url_for
 from collections import namedtuple
-from itertools import cycle
 
 from flask_static.watcher import Watcher
 from flask_static.extensions import extensions
@@ -80,11 +79,13 @@ class Static(object):
         return decorator
 
     def watch(self, path, *tasks):
-        watcher = Watcher(cycle(self.__findFiles(path)), self, tasks,
-                          debug=True)
+        for task in tasks:
+            self.tasks[task] = self.tasks[task]._replace(watched=True)
+
+        watcher = Watcher(path, self, tasks, debug=self.app.debug)
         watcher.start()
 
-    def __findFiles(self, *paths):
+    def findFiles(self, *paths):
         if self.app is None:
             raise ValueError('You should pass a valid application')
         wildcards = [re.compile(r) for r in paths]
@@ -99,7 +100,7 @@ class Static(object):
 
     def __loadResources(self, *paths):
         res = StaticResources()
-        for filename in self.__findFiles(*paths):
+        for filename in self.findFiles(*paths):
             res.add(filename)
         return res
 
