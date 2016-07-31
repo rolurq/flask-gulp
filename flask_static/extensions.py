@@ -52,16 +52,17 @@ def coffee(filename, data):
 def dest(filename, data):
     """
         This extension writes the `data` onto `filename` under the
-        `destination` directory in the settings. This functions closes the
+        `output` directory in the settings. This functions closes the
         pipeline.
     """
-    destination = dest.settings.get('destination')
-    if destination:
-        if not os.path.exists(destination):
-            os.mkdir(destination)
-        _, tail = os.path.split(filename)
-        filename = os.path.join(destination, tail)
+    if filename:
+        output = dest.settings.get('output')
+        if output:
+            if not os.path.exists(output):
+                os.mkdir(output)
+            _, tail = os.path.split(filename)
+            filename = os.path.join(output, tail)
 
-    fo = open(filename, 'w')
-    fo.write(data)
-    fo.close()
+        with open(filename, 'w') as fo:
+            fo.write(data)
+    return filename, None
