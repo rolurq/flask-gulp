@@ -144,6 +144,9 @@ class Static(object):
             for k in extensions:
                 del t.function.__globals__[k]
 
+    def runall(self):
+        self.run(*(task for task in self.tasks))
+
 
 class StaticResources(object):
 
