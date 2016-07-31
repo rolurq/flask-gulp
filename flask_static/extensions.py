@@ -1,7 +1,7 @@
-import subprocess
-
-from functools import wraps
 import os
+import subprocess
+from functools import wraps
+
 
 extensions = {}
 

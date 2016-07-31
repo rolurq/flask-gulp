@@ -1,12 +1,13 @@
-import re
 import os
-
-from jinja2 import Markup
-from flask import url_for
+import re
 from collections import namedtuple
 
-from flask_static.watcher import Watcher
+from flask import url_for
+from jinja2 import Markup
+
 from flask_static.extensions import extensions
+from flask_static.watcher import Watcher
+
 
 Task = namedtuple('Task', ['function', 'items', 'watched'])
 

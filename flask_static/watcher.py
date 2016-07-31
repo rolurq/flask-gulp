@@ -1,6 +1,6 @@
 import os
-
 from threading import Thread
+
 from werkzeug._reloader import ReloaderLoop
 
 
