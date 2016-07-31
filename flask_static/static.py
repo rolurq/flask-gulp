@@ -77,7 +77,8 @@ class Static(object):
         return decorator
 
     def watch(self, path, *tasks):
-        watcher = Watcher(cycle(self.__findFiles(path)), self, tasks)
+        watcher = Watcher(cycle(self.__findFiles(path)), self, tasks,
+                          debug=True)
         watcher.start()
 
     def __findFiles(self, *paths):

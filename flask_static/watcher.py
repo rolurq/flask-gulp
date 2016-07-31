@@ -10,6 +10,7 @@ class Watcher(Thread, ReloaderLoop):
         self.paths = paths
         self.static = static
         self.tasks = tasks
+        self.debug = kwargs.get('debug')
         super(Watcher, self).__init__(*args, **kwargs)
         ReloaderLoop.__init__(self, interval=interval)
 
@@ -24,6 +25,8 @@ class Watcher(Thread, ReloaderLoop):
 
                 oldtime = times.get(filename)
                 if oldtime and currtime > oldtime:
+                    if self.debug:
+                        print('[*] detected changes on %s' % filename)
                     self.static.run(*self.tasks)
                 times[filename] = currtime
             self._sleep(self.interval)
