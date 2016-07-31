@@ -27,8 +27,10 @@ class Static(object):
         @app.context_processor
         def context_processor():
             def build_html(items, wrapper):
-                return Markup('\n'.join((wrapper %
-                    url_for('static', filename=item) for item in items)))
+                return Markup('\n'.join(
+                    (wrapper % url_for('static', filename=os.path.relpath(item,
+                                       self.app.root_path))
+                        for item in items)))
 
             def css(task):
                 wrapper = '<link rel="stylesheet" href="%s" />'
