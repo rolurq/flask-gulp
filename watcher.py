@@ -27,4 +27,3 @@ class Watcher(Thread, ReloaderLoop):
                     self.static.run(*self.tasks)
                 times[filename] = mtime
             self._sleep(self.interval)
-

@@ -118,4 +118,3 @@ class StaticResources(object):
 
     def __iter__(self):
         return iter(self.resources)
-

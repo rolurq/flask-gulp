@@ -42,4 +42,3 @@ def dest(filename, data):
     fo = open(filename, 'w')
     fo.write(data)
     fo.close()
-
