@@ -33,10 +33,16 @@ class Static(object):
                         for item in items)))
 
             def css(task):
+                """
+                    Create links to style files using results from task
+                """
                 wrapper = '<link rel="stylesheet" href="%s" />'
                 return build_html(self.tasks[task].items, wrapper)
 
             def js(task, defer=False, asynchro=False):
+                """
+                    Create links to script files using results from task
+                """
                 attrs = ['src="%s"']
                 if defer:
                     attrs.append('defer')
@@ -48,6 +54,13 @@ class Static(object):
             return dict(js=js, css=css)
 
     def task(self, name):
+        """
+            Decorator to create tasks
+
+            Inside the decorated function scope extensions will be available as
+            globals, also, the `src` function, wich return the object to create
+            the pipeline.
+        """
         def decorator(f):
             self.tasks[name] = Task(f, [])
 

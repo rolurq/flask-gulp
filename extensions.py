@@ -7,6 +7,17 @@ extensions = {}
 
 
 def extension(f):
+    """
+        Decorator to create new extensions
+
+        Each extension will receive a file name in `filename` and its content
+        in `data`. The decorated function must return a tuple `(dest, ouput)`,
+        where `ouput` will be the extension generated new data and `dest` the
+        resulting file name.
+
+        Also, under `<function_name>.settings` a dictionary is stored with the
+        defined values from the extension initialization
+    """
     # keep unwrapped function
     unwrapped = f
 
@@ -39,6 +50,11 @@ def coffee(filename, data):
 
 @extension
 def dest(filename, data):
+    """
+        This extension writes the `data` onto `filename` under the
+        `destination` directory in the settings. This functions closes the
+        pipeline.
+    """
     destination = dest.settings.get('destination')
     if destination:
         if not os.path.exists(destination):
