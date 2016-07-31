@@ -79,22 +79,22 @@ class Static(object):
         return res
 
     def run(self, *tasks):
-        # extend function scope
-        global src
         def src(*paths):
             global res
             res = self.__loadResources(*paths)
             return res
-        globals().update(extensions)
 
         for task in tasks:
-            self.tasks[task].function()
-            self.tasks[task].items = [filename for filename, _ in res]
-
-        # retrieve normal scope
-        del src, res
-        for k in extensions:
-            del globals()[k]
+            t = self.tasks[task]
+            # extend function scope
+            t.function.__globals__.update(extensions)
+            t.function.__globals__['src'] = src
+            t.function()
+            t.items.extend((filename for filename, _ in res))
+            # retrieve normal scope
+            del t.function.__globals__['src']
+            for k in extensions:
+                del t.function.__globals__[k]
 
 
 class StaticResources(object):
