@@ -11,6 +11,7 @@ class Watcher(Thread, ReloaderLoop):
         self.static = static
         self.tasks = tasks
         self.debug = kwargs.get('debug')
+        del kwargs['debug']
         super(Watcher, self).__init__(*args, **kwargs)
         ReloaderLoop.__init__(self, interval=interval)
 
