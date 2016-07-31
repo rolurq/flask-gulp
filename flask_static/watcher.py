@@ -28,5 +28,7 @@ class Watcher(Thread, ReloaderLoop):
                     if self.debug:
                         print('[*] detected changes on %s' % filename)
                     self.static.run(*self.tasks)
+                    times[filename] = currtime
+                    break
                 times[filename] = currtime
             self._sleep(self.interval)
