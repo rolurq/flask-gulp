@@ -5,15 +5,18 @@ from os.path import splitext, join
 
 extensions = {}
 
+
 def extension(f):
-    extensions[f.__name__] = f
     # keep unwrapped function
     unwrapped = f
+
     @wraps(f)
     def wrapper(**kwargs):
         wrapper.settings = dict(kwargs)
         return unwrapped
+    extensions[f.__name__] = wrapper
     return wrapper
+
 
 @extension
 def coffee(filename, data):
