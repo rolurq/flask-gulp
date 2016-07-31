@@ -22,18 +22,21 @@ class Static(object):
         self.tasks = {}
 
     def init_app(self, app):
+        app.config.setdefault('STATIC_WATCHER_INTERVAL', 2)
+        app.config.setdefault('STATIC_INITIAL_PATH', self.app.root_path)
         self.app = app
 
         @app.context_processor
         def context_processor():
             def build_html(wrapper, *tasks):
+                root = app.config.get('STATIC_INITIAL_PATH')
                 markup = ''
                 for task in tasks:
                     markup = markup.join('<!-- %s -->' % task)
                     markup = markup.join(Markup('\n'.join(
                         (wrapper %
-                            url_for('static', filename=os.path.relpath(item,
-                                                self.app.root_path))
+                            url_for('static', filename=
+                                    os.path.relpath(item, root))
                             for item in self.tasks[task].items))))
                 return markup
 
@@ -85,16 +88,19 @@ class Static(object):
         for task in tasks:
             self.tasks[task] = self.tasks[task]._replace(watched=True)
 
-        watcher = Watcher(path, self, tasks, debug=self.app.debug)
+        watcher = Watcher(path, self, tasks, debug=self.app.debug,
+                          interval=self.app.config.
+                          get('STATIC_WATCHER_INTERVAL'))
         watcher.start()
 
     def findFiles(self, *paths):
         if self.app is None:
             raise ValueError('You should pass a valid application')
         wildcards = [re.compile(r) for r in paths]
+        root = self.app.config.get('STATIC_INITIAL_PATH')
 
-        for dirpath, _, filenames in os.walk(self.app.root_path):
-            rpath = os.path.relpath(dirpath, self.app.root_path)
+        for dirpath, _, filenames in os.walk(root):
+            rpath = os.path.relpath(dirpath, root)
             # TODO: delete unnecesary directories
             for f in filenames:
                 for reg in wildcards:
