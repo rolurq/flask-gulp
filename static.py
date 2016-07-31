@@ -42,7 +42,7 @@ class Static(object):
                     attrs.append('defer')
                 if asynchro:
                     attrs.append('async')
-                wrapper = "<script %s></script" % ' '.join(attrs)
+                wrapper = "<script %s></script>" % ' '.join(attrs)
                 return build_html(self.tasks[task].items, wrapper)
 
             return dict(js=js, css=css)
