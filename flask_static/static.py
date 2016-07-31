@@ -150,10 +150,9 @@ class StaticResources(object):
             result = extension(filename, data)
             if result:
                 dest, generated = result
-                if not dest:
+                if not dest and generated:
                     print(generated)
-                else:
-                    self.resources[i] = dest, generated
+                self.resources[i] = dest, generated
         return self
 
     def add(self, filename):
