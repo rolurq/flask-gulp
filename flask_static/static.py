@@ -33,12 +33,13 @@ class Static(object):
                 root = app.config.get('STATIC_GENERATED_LINKS_PATH')
                 markup = ''
                 for task in tasks:
-                    markup = markup.join('<!-- %s -->' % task)
-                    markup = markup.join(Markup('\n'.join(
+                    markup += Markup('<!-- %s -->\n' % task)
+                    markup += Markup('\n'.join(
                         (wrapper %
                             url_for('static', filename=
                                     os.path.relpath(item, root))
-                            for item in self.tasks[task].items))))
+                            for item in self.tasks[task].items)))
+                    markup += '\n'
                 return markup
 
             def css(*tasks):
