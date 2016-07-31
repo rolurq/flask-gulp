@@ -47,8 +47,8 @@ class Static(object):
                     Create links to style files using results from task
                 """
                 # run unwatched tasks
-                self.run((task for task in tasks
-                          if not self.tasks[task].watched))
+                self.run(*(task for task in tasks
+                           if not self.tasks[task].watched))
                 return build_html('<link rel="stylesheet" href="%s"/>', *tasks)
 
             def js(*tasks, **options):
@@ -64,8 +64,8 @@ class Static(object):
                     attrs.append('async')
 
                 # run unwatched tasks
-                self.run((task for task in tasks
-                          if not self.tasks[task].watched))
+                self.run(*(task for task in tasks
+                           if not self.tasks[task].watched))
                 return build_html("<script %s></script>" % ' '.join(attrs),
                                   *tasks)
 
