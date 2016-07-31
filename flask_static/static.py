@@ -24,12 +24,13 @@ class Static(object):
     def init_app(self, app):
         app.config.setdefault('STATIC_WATCHER_INTERVAL', 2)
         app.config.setdefault('STATIC_INITIAL_PATH', app.root_path)
+        app.config.setdefault('STATIC_GENERATED_LINKS_PATH', app.static_folder)
         self.app = app
 
         @app.context_processor
         def context_processor():
             def build_html(wrapper, *tasks):
-                root = app.config.get('STATIC_INITIAL_PATH')
+                root = app.config.get('STATIC_GENERATED_LINKS_PATH')
                 markup = ''
                 for task in tasks:
                     markup = markup.join('<!-- %s -->' % task)
