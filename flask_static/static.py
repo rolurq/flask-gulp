@@ -80,7 +80,7 @@ class Static(object):
             the pipeline.
         """
         def decorator(f):
-            self.tasks[name] = Task(function=f, items=None, watched=False)
+            self.tasks[name] = Task(function=f, items=[], watched=False)
 
             def wrapper(*args, **kwargs):
                 return f(*args, **kwargs)
@@ -129,8 +129,9 @@ class Static(object):
             if self.app.debug:
                 print('[*] running %s...' % task)
             t.function()
-            self.tasks[task] = t._replace(items=(filename
-                                                 for filename, _ in res))
+            self.tasks[task] = t._replace(items=[filename
+                                                 for filename, _ in res
+                                                 if filename])
             # retrieve normal scope
             del t.function.__globals__['src']
             for k in extensions:
