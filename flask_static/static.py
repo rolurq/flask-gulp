@@ -1,15 +1,15 @@
-import re
 import os
-
-from jinja2 import Markup
-from flask import url_for
+import re
 from collections import namedtuple
-from itertools import cycle
 
-from flask_static.watcher import Watcher
+from flask import url_for
+from jinja2 import Markup
+
 from flask_static.extensions import extensions
+from flask_static.watcher import Watcher
 
-Task = namedtuple('Task', ['function', 'items'])
+
+Task = namedtuple('Task', ['function', 'items', 'watched'])
 
 
 class Static(object):
@@ -22,34 +22,52 @@ class Static(object):
         self.tasks = {}
 
     def init_app(self, app):
+        app.config.setdefault('STATIC_WATCHER_INTERVAL', 2)
+        app.config.setdefault('STATIC_INITIAL_PATH', app.root_path)
+        app.config.setdefault('STATIC_GENERATED_LINKS_PATH', app.static_folder)
         self.app = app
 
         @app.context_processor
         def context_processor():
-            def build_html(items, wrapper):
-                return Markup('\n'.join(
-                    (wrapper % url_for('static', filename=os.path.relpath(item,
-                                       self.app.root_path))
-                        for item in items)))
+            def build_html(wrapper, *tasks):
+                root = app.config.get('STATIC_GENERATED_LINKS_PATH')
+                markup = ''
+                for task in tasks:
+                    markup += Markup('<!-- %s -->\n' % task)
+                    markup += Markup('\n'.join(
+                        (wrapper %
+                            url_for('static', filename=
+                                    os.path.relpath(item, root))
+                            for item in self.tasks[task].items)))
+                    markup += '\n'
+                return markup
 
-            def css(task):
+            def css(*tasks):
                 """
                     Create links to style files using results from task
                 """
-                wrapper = '<link rel="stylesheet" href="%s" />'
-                return build_html(self.tasks[task].items, wrapper)
+                # run unwatched tasks
+                self.run(*(task for task in tasks
+                           if not self.tasks[task].watched))
+                return build_html('<link rel="stylesheet" href="%s"/>', *tasks)
 
-            def js(task, defer=False, asynchro=False):
+            def js(*tasks, **options):
                 """
                     Create links to script files using results from task
                 """
+                options.setdefault('defer', False)
+                options.setdefault('asynchro', False)
                 attrs = ['src="%s"']
-                if defer:
+                if options['defer']:
                     attrs.append('defer')
-                if asynchro:
+                if options['asynchro']:
                     attrs.append('async')
-                wrapper = "<script %s></script>" % ' '.join(attrs)
-                return build_html(self.tasks[task].items, wrapper)
+
+                # run unwatched tasks
+                self.run(*(task for task in tasks
+                           if not self.tasks[task].watched))
+                return build_html("<script %s></script>" % ' '.join(attrs),
+                                  *tasks)
 
             return dict(js=js, css=css)
 
@@ -62,23 +80,29 @@ class Static(object):
             the pipeline.
         """
         def decorator(f):
-            self.tasks[name] = Task(f, [])
+            self.tasks[name] = Task(function=f, items=[], watched=False)
 
             def wrapper(*args, **kwargs):
                 return f(*args, **kwargs)
         return decorator
 
     def watch(self, path, *tasks):
-        watcher = Watcher(cycle(self.__findFiles(path)), self, tasks)
+        for task in tasks:
+            self.tasks[task] = self.tasks[task]._replace(watched=True)
+
+        watcher = Watcher(path, self, tasks, debug=self.app.debug,
+                          interval=self.app.config.
+                          get('STATIC_WATCHER_INTERVAL'))
         watcher.start()
 
-    def __findFiles(self, *paths):
+    def findFiles(self, *paths):
         if self.app is None:
             raise ValueError('You should pass a valid application')
         wildcards = [re.compile(r) for r in paths]
+        root = self.app.config.get('STATIC_INITIAL_PATH')
 
-        for dirpath, _, filenames in os.walk(self.app.root_path):
-            rpath = os.path.relpath(dirpath, self.app.root_path)
+        for dirpath, _, filenames in os.walk(root):
+            rpath = os.path.relpath(dirpath, root)
             # TODO: delete unnecesary directories
             for f in filenames:
                 for reg in wildcards:
@@ -87,7 +111,7 @@ class Static(object):
 
     def __loadResources(self, *paths):
         res = StaticResources()
-        for filename in self.__findFiles(*paths):
+        for filename in self.findFiles(*paths):
             res.add(filename)
         return res
 
@@ -102,8 +126,12 @@ class Static(object):
             # extend function scope
             t.function.__globals__.update(extensions)
             t.function.__globals__['src'] = src
+            if self.app.debug:
+                print('[*] running %s...' % task)
             t.function()
-            t.items.extend((filename for filename, _ in res))
+            self.tasks[task] = t._replace(items=[filename
+                                                 for filename, _ in res
+                                                 if filename])
             # retrieve normal scope
             del t.function.__globals__['src']
             for k in extensions:
@@ -122,10 +150,9 @@ class StaticResources(object):
             result = extension(filename, data)
             if result:
                 dest, generated = result
-                if not dest:
+                if not dest and generated:
                     print(generated)
-                else:
-                    self.resources[i] = dest, generated
+                self.resources[i] = dest, generated
         return self
 
     def add(self, filename):
