@@ -30,8 +30,10 @@ class Static(object):
                 for task in tasks:
                     markup = markup.join('<!-- %s -->' % task)
                     markup = markup.join(Markup('\n'.join(
-                        (wrapper % url_for('static', filename=os.path.relpath(item,
-                            self.app.root_path)) for item in self.tasks[task].items))))
+                        (wrapper %
+                            url_for('static', filename=os.path.relpath(item,
+                                                self.app.root_path))
+                            for item in self.tasks[task].items))))
                 return markup
 
             def css(*tasks):

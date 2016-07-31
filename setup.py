@@ -1,5 +1,6 @@
 from setuptools import setup
 
+
 def get_version():
     with open('version') as f:
         return f.read()
