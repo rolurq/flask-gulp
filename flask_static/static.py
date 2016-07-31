@@ -26,30 +26,38 @@ class Static(object):
 
         @app.context_processor
         def context_processor():
-            def build_html(items, wrapper):
-                return Markup('\n'.join(
-                    (wrapper % url_for('static', filename=os.path.relpath(item,
-                                       self.app.root_path))
-                        for item in items)))
+            def build_html(wrapper, *tasks):
+                markup = ''
+                for task in tasks:
+                    markup = markup.join('<!-- %s -->' % task)
+                    markup = markup.join(Markup('\n'.join(
+                        (wrapper % url_for('static', filename=os.path.relpath(item,
+                            self.app.root_path)) for item in self.tasks[task].items))))
+                return markup
 
-            def css(task):
+            def css(*tasks):
                 """
                     Create links to style files using results from task
                 """
-                wrapper = '<link rel="stylesheet" href="%s" />'
-                return build_html(self.tasks[task].items, wrapper)
+                if not self.app.debug:
+                    self.run(*tasks)
+                return build_html('<link rel="stylesheet" href="%s"/>', *tasks)
 
-            def js(task, defer=False, asynchro=False):
+            def js(*tasks, **options):
                 """
                     Create links to script files using results from task
                 """
+                options.setdefault('defer', False)
+                options.setdefault('asynchro', False)
                 attrs = ['src="%s"']
-                if defer:
+                if options['defer']:
                     attrs.append('defer')
-                if asynchro:
+                if options['asynchro']:
                     attrs.append('async')
-                wrapper = "<script %s></script>" % ' '.join(attrs)
-                return build_html(self.tasks[task].items, wrapper)
+                if not self.app.debug:
+                    self.run(*tasks)
+                return build_html("<script %s></script>" % ' '.join(attrs),
+                                  *tasks)
 
             return dict(js=js, css=css)
 
