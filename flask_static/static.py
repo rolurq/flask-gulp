@@ -22,7 +22,7 @@ class Static(object):
         self.tasks = {}
 
     def init_app(self, app):
-        app.config.setdefault('STATIC_WATCHER_INTERVAL', 2)
+        app.config.setdefault('STATIC_WATCHER_INTERVAL', 1)
         app.config.setdefault('STATIC_INITIAL_PATH', app.root_path)
         app.config.setdefault('STATIC_GENERATED_LINKS_PATH', app.static_folder)
         app.config.setdefault('STATIC_RUN_ON_REFRESH', True)
