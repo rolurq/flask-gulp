@@ -36,10 +36,14 @@ def coffee(filename, data):
         dest = filename.replace(ext, '.js')
         return dest, out
 
+
 @extension
 def dest(filename, data):
     destination = dest.settings.get('destination')
     if destination:
+        if not os.path.exists(destination):
+            os.mkdir(destination)
+        _, tail = os.path.split(filename)
         filename = os.path.join(destination, tail)
 
     fo = open(filename, 'w')
