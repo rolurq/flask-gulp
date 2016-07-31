@@ -110,6 +110,8 @@ class Static(object):
             # extend function scope
             t.function.__globals__.update(extensions)
             t.function.__globals__['src'] = src
+            if self.app.debug:
+                print('[*] running %s...' % task)
             t.function()
             self.tasks[task] = t._replace(items=(filename
                                                  for filename, _ in res))
