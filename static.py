@@ -50,6 +50,9 @@ class Static(object):
     def task(self, name):
         def decorator(f):
             self.tasks[name] = Task(f, [])
+
+            def wrapper(*args, **kwargs):
+                return f(*args, **kwargs)
         return decorator
 
     def watch(self, path, *tasks):
