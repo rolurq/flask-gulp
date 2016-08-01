@@ -29,13 +29,7 @@ def extension(f):
     return wrapper
 
 
-@extension
-def coffee(filename, data):
-    command = ['coffee', '-c', '-s']
-    bare = coffee.settings.get('bare')
-    if bare:
-        command.append('-b')
-
+def runner(command, filename, data, ext):
     process = subprocess.Popen(command, stdin=subprocess.PIPE,
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = process.communicate(data)
@@ -43,9 +37,39 @@ def coffee(filename, data):
     if process.returncode:
         return None, err
     else:
-        _, ext = os.path.splitext(filename)
-        dest = filename.replace(ext, '.js')
+        _, fext = os.path.splitext(filename)
+        dest = filename.replace(fext, ext)
         return dest, out
+
+
+@extension
+def coffee(filename, data):
+    bare = coffee.settings.get('bare')
+    executable = coffee.settings.get('executable')
+
+    command = [executable or 'coffee', '-c', '-s']
+    if bare:
+        command.append('-b')
+
+    return runner(command, filename, data, '.js')
+
+
+@extension
+def cjsx(filename, data):
+    bare = cjsx.settings.get('bare')
+    executable = cjsx.settings.get('executable')
+
+    command = [executable or 'cjsx', '-c', '-s']
+    if bare:
+        command.append('-b')
+
+    return runner(command, filename, data, '.js')
+
+
+@extension
+def less(filename, data):
+    executable = less.settings.get('executable')
+    return runner([executable or 'lessc', '-'], filename, data, '.css')
 
 
 @extension
