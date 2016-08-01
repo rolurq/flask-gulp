@@ -25,7 +25,7 @@ class Static(object):
         app.config.setdefault('STATIC_WATCHER_INTERVAL', 1)
         app.config.setdefault('STATIC_INITIAL_PATH', app.root_path)
         app.config.setdefault('STATIC_GENERATED_LINKS_PATH', app.static_folder)
-        app.config.setdefault('STATIC_RUN_ON_REFRESH', True)
+        app.config.setdefault('STATIC_RUN_ON_REFRESH', False)
         self.app = app
 
         @app.context_processor
