@@ -100,6 +100,7 @@ class Static(object):
         watcher = Watcher(path, self, tasks, debug=self.app.debug,
                           interval=self.app.config.
                           get('STATIC_WATCHER_INTERVAL'))
+        self.run(*tasks)
         watcher.start()
 
     def findFiles(self, *paths):
