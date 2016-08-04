@@ -29,6 +29,7 @@ def compile(*patterns):
                 if scape:
                     last += 1
                     wildtree.addGoto(q, symbol, last)
+                    q = last
                     scape = False
                 elif j + 1 < lenght and s[j + 1] == '*':
                     wildtree.addOutput(q, DoubleAsterisk)
@@ -38,29 +39,32 @@ def compile(*patterns):
             else:
                 last += 1
                 wildtree.addGoto(q, symbol, last)
-            q = last
+                q = last
             j += 1
         wildtree.addOutput(q)
     # create FAILURE
     queue = deque()
     for i, state in enumerate(wildtree.goto(0)):
-        if state is None:
-            wildtree.addGoto(0, i, 0)
-        elif state != 0:
+        # if state is None:
+        #     wildtree.addGoto(0, i, 0)
+        # elif state != 0:
+        if None is not state is not 0:
             queue.append(state)
-            wildtree.setFailure(state, 0)
+            # wildtree.setFailure(state, 0)
     while len(queue):
         r = queue.popleft()
         aster = wildtree.output(r).aster
         for symbol, state in enumerate(wildtree.goto(r)):
             if state is not None:
                 queue.append(state)
-                if aster is None or aster is Asterisk and symbol == '/':
-                    q = wildtree.failure(r)
-                    while wildtree.goto(q, symbol) is None:
-                        q = wildtree.failure(q)
-                    wildtree.setFailure(state, wildtree.goto(q, symbol))
-                else:
+                if aster is Asterisk and symbol != '/' or\
+                        aster is DoubleAsterisk:
+                # if aster is None or aster is Asterisk and symbol == '/':
+                #     q = wildtree.failure(r)
+                #     while wildtree.goto(q, symbol) is None:
+                #         q = wildtree.failure(q)
+                #     wildtree.setFailure(state, wildtree.goto(q, symbol))
+                # else:
                     # ** and * children fails onto ** and *
                     wildtree.setFailure(state, r)
     return wildtree
@@ -105,6 +109,7 @@ class Wildcard:
         self.gotof = GrowList(call=lambda: [None for _ in xrange(CHAR_COUNT)])
         self.failuref = GrowList()
         self.outputf = GrowList(call=Output)
+        self.mmode = False
 
     def addGoto(self, src, symbol, dest):
         # self.gotof.append([None for _ in xrange(CHAR_COUNT)])
@@ -133,7 +138,7 @@ class Wildcard:
             loop = None
         symbol = symbol if isinstance(symbol, int) else ord(symbol)
         trans = self.gotof[state][symbol]
-        return trans if trans == 0 else trans or loop
+        return trans if trans == 0 or not self.mmode else trans or loop
 
     def failure(self, state):
         return self.failuref[state]
@@ -142,14 +147,19 @@ class Wildcard:
         return self.outputf[state]
 
     def match(self, cad):
+        self.mmode = True
         q = 0
         c = 0
+        ret = False
         for symbol in cad:
-            q = self.goto[q][symbol]
-            while q is None:
-                q = self.gotof[self.failuref[q]][symbol]
+            while self.goto(q, symbol) is None:
+                q = self.failuref[q]
+                if q is None:
+                    ret = False
+                    break
+            q = self.goto(q, symbol)
             if q:
                 c += 1
-            if self.outputf[q].final:
-                return True, c
-        return False, c
+            ret = self.outputf[q].final
+        self.mmode = False
+        return ret, c
