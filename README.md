@@ -15,17 +15,16 @@ Adding tasks is controlled by a decorator:
 ```python
 @static.task('coffee')
 def coffee_task():
-    src(r'static/coffee/.*\.coffee$')
-        .pipe(coffee(bare=True))
+    src(r'static/coffee/**/*.coffee')\
+        .pipe(coffee(bare=True))\
         .pipe(dest(output='static/js/'))
 ```
 
 The `src` function is provided as a global to the task function scope. The `coffee` and `dest` function are extensions also provided as globals.
-
-As you can see, the workflow is similar to [gulp](URL). The path are currently being readed using regular expressions, in the future, wildcards will be suported.
+As you can see, the workflow is similar to [gulp](URL).
 
 ## The `js` and `css` functions
-Inspired by [Flask-Funnel](URL), the `js` and `css` function are provided to the application context in order to generate the corresponding links:
+Inspired by [Flask-Funnel](URL), the `js` and `css` functions are provided to the application context in order to generate the corresponding links:
 
 ```html+jinja
 <head>
@@ -41,7 +40,9 @@ Inspired by [Flask-Funnel](URL), the `js` and `css` function are provided to the
 Each one receives multiple tasks names and generate the links to the compiled files.
 
 ## Extensions
-Flask-Static comes shiped with two extensions, `coffee` and `dest`. The first executes `coffee` from the `PATH`. To add new extensions use the decorator provided with Flask-Static:
+Flask-Static comes shiped with four extensions, `coffee`, `cjsx`, `less` and `dest`. The first ones accept an `executable` setting variable with the binary location, the default is to use the `$PATH`.
+
+To add new extensions use the decorator provided with Flask-Static:
 
 ```python
 from flask.ext.static.extensions import extension
