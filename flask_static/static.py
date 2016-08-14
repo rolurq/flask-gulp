@@ -106,7 +106,15 @@ class Static(object):
     def findFiles(self, *paths):
         if self.app is None:
             raise ValueError('You should pass a valid application')
-        wildcards = [re.compile(r) for r in paths]
+        # convert wildcard to regular expression
+        wildcards = [
+            re.compile(r.replace('.', r'\.')
+                        .replace('?', r'.')
+                        .replace('**/', '\04')
+                        .replace('*', r'[^/]*')
+                        .replace('\04', r'.*/?') + r'$')
+            for r in paths
+        ]
         root = self.app.config.get('STATIC_INITIAL_PATH')
 
         for dirpath, _, filenames in os.walk(root):
