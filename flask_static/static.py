@@ -1,10 +1,10 @@
 import os
-import re
 from collections import namedtuple
 
 from flask import url_for
 from jinja2 import Markup
 
+import wildcard
 from flask_static.extensions import extensions
 from flask_static.watcher import Watcher
 
