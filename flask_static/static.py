@@ -110,7 +110,7 @@ class Static(object):
 
         for path in paths:
             for filename in wildcard.wildcard(os.path.join(root, path)):
-                yield os.path.relpath(filename, root)
+                yield filename
 
     def __loadResources(self, *paths):
         res = StaticResources()
