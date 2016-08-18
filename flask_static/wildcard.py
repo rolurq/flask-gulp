@@ -63,4 +63,3 @@ def _rlistdir(dirname):
 
 def _isrecursive(pattern):
     return pattern == '**'
-
