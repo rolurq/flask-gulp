@@ -106,24 +106,11 @@ class Static(object):
     def findFiles(self, *paths):
         if self.app is None:
             raise ValueError('You should pass a valid application')
-        # convert wildcard to regular expression
-        wildcards = [
-            re.compile(r.replace('.', r'\.')
-                        .replace('?', r'.')
-                        .replace('**/', '\04')
-                        .replace('*', r'[^/]*')
-                        .replace('\04', r'.*/?') + r'$')
-            for r in paths
-        ]
         root = self.app.config.get('STATIC_INITIAL_PATH')
 
-        for dirpath, _, filenames in os.walk(root):
-            rpath = os.path.relpath(dirpath, root)
-            # TODO: delete unnecesary directories
-            for f in filenames:
-                for reg in wildcards:
-                    if reg.match(os.path.join(rpath, f)):
-                        yield os.path.join(dirpath, f)
+        for path in paths:
+            for filename in wildcard.wildcard(os.path.join(root, path)):
+                yield os.path.relpath(filename, root)
 
     def __loadResources(self, *paths):
         res = StaticResources()
