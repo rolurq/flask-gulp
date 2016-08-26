@@ -93,14 +93,15 @@ class Static(object):
                 return f(*args, **kwargs)
         return decorator
 
-    def watch(self, path, *tasks):
+    def watch(self, paths, *tasks):
         for task in tasks:
             self.tasks[task] = self.tasks[task]._replace(watched=True)
 
-        watcher = Watcher(path, self, tasks, debug=self.app.debug,
+        watcher = Watcher(paths, self, tasks, debug=self.app.debug,
                           interval=self.app.config.
                           get('STATIC_WATCHER_INTERVAL'))
         self.run(*tasks)
+        watcher.daemon = True
         watcher.start()
 
     def findFiles(self, *paths):
