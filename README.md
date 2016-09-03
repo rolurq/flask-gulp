@@ -2,7 +2,7 @@
 Task manager similar to [gulp](URL) for the processing of static files.
 
 ## Working with Flask-Static
-Setting up Flask-Static is quite easy. You only need to add:
+Setting up Flask-Static is quite easy. Here is an example:
 
 ```python
 from flask.ext.static import Static
@@ -10,7 +10,7 @@ from flask.ext.static import Static
 static = Static(app)
 ```
 
-Adding tasks is controlled by a decorator:
+This allows to add tasks with the `task` decorator:
 
 ```python
 @static.task('coffee')
@@ -20,7 +20,8 @@ def coffee_task():
         .pipe(dest(output='static/js/'))
 ```
 
-The `src` function is provided as a global to the task function scope. The `coffee` and `dest` function are extensions also provided as globals.
+The `src` function is provided as a global to the task function scope along with all the extensions.
+
 As you can see, the workflow is similar to [gulp](URL).
 
 ## The `js` and `css` functions
@@ -37,10 +38,10 @@ Inspired by [Flask-Funnel](URL), the `js` and `css` functions are provided to th
 </body>
 ```
 
-Each one receives multiple tasks names and generate the links to the compiled files.
+Each one receives multiple tasks names and generate the links to the generated files.
 
 ## Extensions
-Flask-Static comes shiped with four extensions, `coffee`, `cjsx`, `less` and `dest`. The first ones accept an `executable` setting variable with the binary location, the default is to use the `$PATH`.
+Flask-Static comes shiped with four extensions, `coffee`, `cjsx`, `less` and `dest`. The first ones accept an `executable` setting, which holds the corresponding binary location, the default is to call it directly.
 
 To add new extensions use the decorator provided with Flask-Static:
 
