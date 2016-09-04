@@ -1,2 +1,2 @@
-from flask_static.static import Static
-from flask_static.extensions import extension
+from flask_bid.static import Static
+from flask_bid.extensions import extension
