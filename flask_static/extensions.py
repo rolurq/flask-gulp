@@ -31,7 +31,7 @@ def extension(f):
 
 def runner(command, filename, data, ext):
     process = subprocess.Popen(command, stdin=subprocess.PIPE,
-                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                               stdout=subprocess.PIPE, shell=True)
     out, err = process.communicate(data)
 
     if process.returncode:
@@ -47,9 +47,9 @@ def coffee(filename, data):
     bare = coffee.settings.get('bare')
     executable = coffee.settings.get('executable')
 
-    command = [executable or 'coffee', '-c', '-s']
+    command = "%s -c -s" % (executable or 'coffee')
     if bare:
-        command.append('-b')
+        command = ' '.join((command, ' -b'))
 
     return runner(command, filename, data, '.js')
 
@@ -59,9 +59,9 @@ def cjsx(filename, data):
     bare = cjsx.settings.get('bare')
     executable = cjsx.settings.get('executable')
 
-    command = [executable or 'cjsx', '-c', '-s']
+    command = "%s -c -s" % (executable or 'cjsx')
     if bare:
-        command.append('-b')
+        command = ' '.join((executable, '-b'))
 
     return runner(command, filename, data, '.js')
 
@@ -69,7 +69,7 @@ def cjsx(filename, data):
 @extension
 def less(filename, data):
     executable = less.settings.get('executable')
-    return runner([executable or 'lessc', '-'], filename, data, '.css')
+    return runner("%s -" % (executable or 'lessc'), filename, data, '.css')
 
 
 @extension
