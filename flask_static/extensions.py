@@ -31,7 +31,7 @@ def extension(f):
 
 def runner(command, filename, data, ext):
     process = subprocess.Popen(command, stdin=subprocess.PIPE,
-                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                               stdout=subprocess.PIPE, shell=True)
     out, err = process.communicate(data)
 
     if process.returncode:
@@ -46,10 +46,9 @@ def runner(command, filename, data, ext):
 def coffee(filename, data):
     bare = coffee.settings.get('bare')
     executable = coffee.settings.get('executable')
-
-    command = [executable or 'coffee', '-c', '-s']
+    command = "%s -c -s" % (executable or 'coffee')
     if bare:
-        command.append('-b')
+        command = command.join(' -b')
 
     return runner(command, filename, data, '.js')
 
