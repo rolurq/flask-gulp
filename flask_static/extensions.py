@@ -61,7 +61,7 @@ def cjsx(filename, data):
 
     command = "%s -c -s" % (executable or 'cjsx')
     if bare:
-        command = ' '.join((executable, '-b'))
+        command = ' '.join((command, '-b'))
 
     return runner(command, filename, data, '.js')
 
