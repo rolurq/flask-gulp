@@ -5,8 +5,8 @@ from flask import url_for
 from jinja2 import Markup
 
 import wildcard
-from flask_static.extensions import extensions
-from flask_static.watcher import Watcher
+from flask_bid.extensions import extensions
+from flask_bid.watcher import Watcher
 
 
 Task = namedtuple('Task', ['function', 'items', 'watched'])
