@@ -1,11 +1,11 @@
-# Flask-Bid
+# Flask-Gulp
 Task manager similar to [gulp](URL) for the processing of static files.
 
-## Working with Flask-Bid
-Setting up Flask-Bid is quite easy. Here is an example:
+## Working with Flask-Gulp
+Setting up Flask-Gulp is quite easy. Here is an example:
 
 ```python
-from flask.ext.bid import Static
+from flask.ext.gulp import Static
 
 static = Static(app)
 ```
@@ -41,9 +41,9 @@ Inspired by [Flask-Funnel](URL), the `js` and `css` functions are provided to th
 Each one receives multiple tasks names and generate the links to the generated files.
 
 ## Extensions
-Flask-Bid comes shiped with four extensions, `coffee`, `cjsx`, `less` and `dest`. The first ones accept an `executable` setting, which holds the corresponding binary location, the default is to call it directly.
+Flask-Gulp comes shiped with four extensions, `coffee`, `cjsx`, `less` and `dest`. The first ones accept an `executable` setting, which holds the corresponding binary location, the default is to call it directly.
 
-To add new extensions use the decorator provided with Flask-Bid:
+To add new extensions use the decorator provided with Flask-Gulp:
 
 ```python
 from flask.ext.static.extensions import extension
