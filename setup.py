@@ -13,4 +13,5 @@ setup(name='Flask-Gulp', license='MIT', author='Rolando Urquiza',
       classifiers=['Environment :: Web Environment',
                    'Intended Audience :: Developers',
                    'Operating System :: OS Independent',
-                   'Programming Language :: Python'])
+                   'Programming Language :: Python'],
+      url='https://github.com/rolurq/flask-gulp')
