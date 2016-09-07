@@ -1,12 +1,8 @@
 from setuptools import setup
 
 
-def get_version():
-    with open('version') as f:
-        return f.read()
-
 setup(name='Flask-Gulp', license='MIT', author='Rolando Urquiza',
-      author_email='rolurquiza@gmail.com', version=get_version(),
+      author_email='rolurquiza@gmail.com', version='0.2.3',
       description='Task executioner similar to gulp for Python',
       packages=['flask_gulp'], platforms='any',
       install_requires=['flask', 'werkzeug'],
