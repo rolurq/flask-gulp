@@ -1,7 +1,7 @@
 from __future__ import print_function
 import os
 import sys
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 
 from flask import url_for
 from jinja2 import Markup
@@ -21,7 +21,7 @@ class Static(object):
             self.init_app(app)
         else:
             self.app = None
-        self.tasks = {}
+        self.tasks = OrderedDict()
 
     def init_app(self, app):
         app.config.setdefault('STATIC_WATCHER_INTERVAL', 1)
