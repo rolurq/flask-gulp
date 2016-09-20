@@ -79,14 +79,13 @@ def dest(filename, data):
         `output` directory in the settings. This functions closes the
         pipeline.
     """
-    if filename:
-        output = dest.settings.get('output')
-        if output:
-            if not os.path.exists(output):
-                os.mkdir(output)
-            _, tail = os.path.split(filename)
-            filename = os.path.join(output, tail)
+    output = dest.settings.get('output')
+    if output:
+        if not os.path.exists(output):
+            os.mkdir(output)
+        _, tail = os.path.split(filename)
+        filename = os.path.join(output, tail)
 
-        with open(filename, 'w') as fo:
-            fo.write(data)
+    with open(filename, 'w') as fo:
+        fo.write(data)
     return filename, None
