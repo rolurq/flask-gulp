@@ -43,7 +43,7 @@ def runner(command, filename, data, ext):
 
 
 @extension
-def coffee(filename, data):
+def coffee(resources):
     bare = coffee.settings.get('bare')
     executable = coffee.settings.get('executable')
 
@@ -51,11 +51,12 @@ def coffee(filename, data):
     if bare:
         command = ' '.join((command, ' -b'))
 
-    return runner(command, filename, data, '.js')
+    return (runner(command, filename, data, '.js') for filename, data in
+            resources)
 
 
 @extension
-def cjsx(filename, data):
+def cjsx(resources):
     bare = cjsx.settings.get('bare')
     executable = cjsx.settings.get('executable')
 
@@ -63,24 +64,26 @@ def cjsx(filename, data):
     if bare:
         command = ' '.join((command, '-b'))
 
-    return runner(command, filename, data, '.js')
+    return (runner(command, filename, data, '.js') for filename, data in
+            resources)
 
 
 @extension
-def less(filename, data):
+def less(resources):
     executable = less.settings.get('executable')
-    return runner("%s -" % (executable or 'lessc'), filename, data, '.css')
+    return (runner("%s -" % (executable or 'lessc'), filename, data, '.css')
+            for filename, data in resources)
 
 
 @extension
-def dest(filename, data):
+def dest(resources):
     """
         This extension writes the `data` onto `filename` under the
         `output` directory in the settings. This functions closes the
         pipeline.
     """
-    if filename:
-        output = dest.settings.get('output')
+    output = dest.settings.get('output')
+    for filename, data in resources:
         if output:
             if not os.path.exists(output):
                 os.mkdir(output)
@@ -89,4 +92,4 @@ def dest(filename, data):
 
         with open(filename, 'w') as fo:
             fo.write(data)
-    return filename, None
+        yield filename, None
