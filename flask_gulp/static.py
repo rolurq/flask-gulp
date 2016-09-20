@@ -1,4 +1,6 @@
+from __future__ import print_function
 import os
+import sys
 from collections import namedtuple
 
 from flask import url_for
@@ -155,24 +157,19 @@ class StaticResources(object):
             self.add(f)
         self.gen = None
 
-    def results(self, extension):
-        for filename, data in self.resources:
-            result = extension(filename, data)
-            if result:
-                dest, generated = result
-                if not dest and generated:
-                    print(generated)
-                else:
-                    yield dest, generated
-
     def pipe(self, extension):
         if self.gen:
             self.close()
-        self.gen = self.results(extension)
+        self.gen = extension(self.resources)
         return self
 
     def close(self):
-        self.resources = list(self.gen)
+        self.resources = []
+        for dest, generated in self.gen:
+            if not dest and generated:
+                print(generated, file=sys.stderr)
+            else:
+                self.resources.append((dest, generated))
 
     def add(self, filename):
         f = open(filename)
