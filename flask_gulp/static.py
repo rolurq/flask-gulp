@@ -134,6 +134,7 @@ class Static(object):
             if self.app.debug:
                 print('[*] running %s...' % task)
             t.function()
+            res.close()
             self.tasks[task] = t._replace(items=[filename
                                                  for filename, _ in res
                                                  if filename])
@@ -152,16 +153,26 @@ class StaticResources(object):
         self.resources = []
         for f in files:
             self.add(f)
+        self.gen = None
 
-    def pipe(self, extension):
-        for i, (filename, data) in enumerate(self.resources):
+    def results(self, extension):
+        for filename, data in self.resources:
             result = extension(filename, data)
             if result:
                 dest, generated = result
                 if not dest and generated:
                     print(generated)
-                self.resources[i] = dest, generated
+                else:
+                    yield dest, generated
+
+    def pipe(self, extension):
+        if self.gen:
+            self.close()
+        self.gen = self.results(extension)
         return self
+
+    def close(self):
+        self.resources = list(self.gen)
 
     def add(self, filename):
         f = open(filename)
