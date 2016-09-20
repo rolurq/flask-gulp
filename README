@@ -5,7 +5,7 @@ Task manager similar to [gulp](URL) for the processing of static files.
 Setting up Flask-Gulp is quite easy. Here is an example:
 
 ```python
-from flask.ext.gulp import Static
+from flask_gulp import Static
 
 static = Static(app)
 ```
@@ -46,7 +46,7 @@ Flask-Gulp comes shiped with four extensions, `coffee`, `cjsx`, `less` and `dest
 To add new extensions use the decorator provided with Flask-Gulp:
 
 ```python
-from flask.ext.static.extensions import extension
+from flask_gulp.extensions import extension
 
 @extension
 def cjsx(filename, data):
