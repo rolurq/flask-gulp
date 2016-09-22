@@ -84,12 +84,13 @@ def dest(resources):
     """
     output = dest.settings.get('output')
     for filename, data in resources:
-        if output:
-            if not os.path.exists(output):
-                os.mkdir(output)
-            _, tail = os.path.split(filename)
-            filename = os.path.join(output, tail)
+        if filename:
+            if output:
+                if not os.path.exists(output):
+                    os.mkdir(output)
+                _, tail = os.path.split(filename)
+                filename = os.path.join(output, tail)
 
-        with open(filename, 'w') as fo:
-            fo.write(data)
-        yield filename, None
+            with open(filename, 'w') as fo:
+                fo.write(data)
+            yield filename, None
