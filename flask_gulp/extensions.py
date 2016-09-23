@@ -87,7 +87,7 @@ def dest(resources):
         if filename:
             if output:
                 if not os.path.exists(output):
-                    os.mkdir(output)
+                    os.makedirs(output)
                 _, tail = os.path.split(filename)
                 filename = os.path.join(output, tail)
 
