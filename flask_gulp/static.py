@@ -6,7 +6,7 @@ from collections import namedtuple, OrderedDict
 from flask import url_for
 from jinja2 import Markup
 
-import wildcard
+from . import wildcard
 from flask_gulp.extensions import extensions
 from flask_gulp.watcher import Watcher
 
@@ -118,7 +118,7 @@ class Static(object):
 
     def __loadResources(self, *paths):
         res = StaticResources()
-        for filename in self.findFiles(*paths):
+        for filename, _ in self.findFiles(*paths):
             res.add(filename)
         return res
 
