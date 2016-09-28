@@ -28,6 +28,7 @@ class Static(object):
         app.config.setdefault('STATIC_INITIAL_PATH', app.root_path)
         app.config.setdefault('STATIC_GENERATED_LINKS_PATH', app.static_folder)
         app.config.setdefault('STATIC_RUN_ON_REFRESH', False)
+        app.config.setdefault('STATIC_DEBUG', app.debug)
         self.app = app
 
         @app.context_processor
@@ -100,9 +101,10 @@ class Static(object):
         for task in tasks:
             self.tasks[task] = self.tasks[task]._replace(watched=True)
 
-        watcher = Watcher(paths, self, tasks, debug=self.app.debug,
-                          interval=self.app.config.
-                          get('STATIC_WATCHER_INTERVAL'))
+        watcher = Watcher(paths, self, tasks,
+                          debug=self.app.config.get('STATIC_DEBUG'),
+                          interval=self.app.config
+                          .get('STATIC_WATCHER_INTERVAL'))
         self.run(*tasks)
         watcher.daemon = True
         watcher.start()
@@ -133,7 +135,7 @@ class Static(object):
             # extend function scope
             t.function.__globals__.update(extensions)
             t.function.__globals__['src'] = src
-            if self.app.debug:
+            if self.app.config.get('STATIC_DEBUG'):
                 print('[*] running %s...' % task)
             t.function()
             res.close()
