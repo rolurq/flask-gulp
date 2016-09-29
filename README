@@ -1,5 +1,5 @@
 # Flask-Gulp
-Task manager similar to [gulp](URL) for the processing of static files.
+Task manager similar to [gulp](https://www.npmjs.com/package/gulp) for the processing of static files.
 
 ## Working with Flask-Gulp
 Setting up Flask-Gulp is quite easy. Here is an example:
@@ -22,7 +22,7 @@ def coffee_task():
 
 The `src` function is provided as a global to the task function scope along with all the extensions.
 
-As you can see, the workflow is similar to [gulp](URL).
+As you can see, the workflow is similar to [gulp](https://www.npmjs.com/package/gulp).
 
 ## The `js` and `css` functions
 Inspired by [Flask-Funnel](URL), the `js` and `css` functions are provided to the application context in order to generate the corresponding links:
