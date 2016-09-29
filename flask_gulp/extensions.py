@@ -2,6 +2,8 @@ import os
 import subprocess
 from functools import wraps
 
+from . import File
+
 
 extensions = {}
 
@@ -29,17 +31,17 @@ def extension(f):
     return wrapper
 
 
-def runner(command, filename, data, ext):
+def runner(command, f, ext):
     process = subprocess.Popen(command, stdin=subprocess.PIPE,
                                stdout=subprocess.PIPE, shell=True)
-    out, err = process.communicate(data)
+    out, err = process.communicate(f.content)
 
     if process.returncode:
-        return None, err
+        return f._replace(filename=None, content=err)
     else:
-        _, fext = os.path.splitext(filename)
-        dest = filename.replace(fext, ext)
-        return dest, out
+        _, fext = os.path.splitext(f.filename)
+        dest = f.filename.replace(fext, ext)
+        return f._replace(filename=dest, content=out)
 
 
 @extension
@@ -51,8 +53,7 @@ def coffee(resources):
     if bare:
         command = ' '.join((command, ' -b'))
 
-    return (runner(command, filename, data, '.js') for filename, data in
-            resources)
+    return (runner(command, f, '.js') for f in resources)
 
 
 @extension
@@ -64,15 +65,14 @@ def cjsx(resources):
     if bare:
         command = ' '.join((command, '-b'))
 
-    return (runner(command, filename, data, '.js') for filename, data in
-            resources)
+    return (runner(command, f, '.js') for f in resources)
 
 
 @extension
 def less(resources):
     executable = less.settings.get('executable')
-    return (runner("%s -" % (executable or 'lessc'), filename, data, '.css')
-            for filename, data in resources)
+    return (runner("%s -" % (executable or 'lessc'), f, '.css')
+            for f in resources)
 
 
 @extension

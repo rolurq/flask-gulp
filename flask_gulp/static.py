@@ -1,17 +1,14 @@
 from __future__ import print_function
 import os
 import sys
-from collections import namedtuple, OrderedDict
+from collections import OrderedDict
 
 from flask import url_for
 from jinja2 import Markup
 
-from . import wildcard
-from flask_gulp.extensions import extensions
-from flask_gulp.watcher import Watcher
-
-
-Task = namedtuple('Task', ['function', 'items', 'watched'])
+from . import wildcard, File, Task
+from .extensions import extensions
+from .watcher import Watcher
 
 
 class Static(object):
@@ -120,8 +117,8 @@ class Static(object):
 
     def __loadResources(self, *paths):
         res = StaticResources()
-        for filename, _ in self.findFiles(*paths):
-            res.add(filename)
+        for filename, relativ in self.findFiles(*paths):
+            res.add(filename, relativ)
         return res
 
     def run(self, *tasks):
@@ -139,9 +136,9 @@ class Static(object):
                 print('[*] running %s...' % task)
             t.function()
             res.close()
-            self.tasks[task] = t._replace(items=[filename
-                                                 for filename, _ in res
-                                                 if filename])
+            self.tasks[task] = t._replace(items=[f.filename
+                                                 for f in res
+                                                 if f.filename])
             # retrieve normal scope
             del t.function.__globals__['src']
             for k in extensions:
@@ -167,16 +164,14 @@ class StaticResources(object):
 
     def close(self):
         self.resources = []
-        for dest, generated in self.gen:
-            if not dest and generated:
-                print(generated, file=sys.stderr)
+        for generated in self.gen:
+            if not generated.filename and generated.content:
+                print(generated.content, file=sys.stderr)
             else:
-                self.resources.append((dest, generated))
+                self.resources.append(generated)
 
-    def add(self, filename):
-        f = open(filename)
-        self.resources.append((filename, f.read()))
-        f.close()
+    def add(self, filename, rel):
+        self.resources.append(File(filename, rel, None))
 
     def __iter__(self):
         return iter(self.resources)

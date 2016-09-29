@@ -1,6 +1,11 @@
-from flask_gulp.static import Static
-from flask_gulp.extensions import extension
+from collections import namedtuple
 
+
+Task = namedtuple('Task', ['function', 'items', 'watched'])
+File = namedtuple('File', ['filename', 'rel_name', 'content'])
+
+from .static import Static
+from .extensions import extension
 
 __all__ = [
     'Static',
