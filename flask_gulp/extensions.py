@@ -83,14 +83,19 @@ def dest(resources):
         pipeline.
     """
     output = dest.settings.get('output')
-    for filename, data in resources:
-        if filename:
+    for f in resources:
+        if f.filename:
             if output:
-                if not os.path.exists(output):
-                    os.makedirs(output)
-                _, tail = os.path.split(filename)
-                filename = os.path.join(output, tail)
+                base, _ = os.path.split(f.rel_name)
+                # create the new file in the same relative path
+                dest_dir = os.path.join(output, base)
+                if not os.path.exists(dest_dir):
+                    os.makedirs(dest_dir)
+                _, tail = os.path.split(f.filename)
+                filename = os.path.join(dest_dir, tail)
+            else:
+                filename = f.filename
 
             with open(filename, 'w') as fo:
-                fo.write(data)
-            yield filename, None
+                fo.write(f.content)
+            yield f._replace(filename=filename, content=None)
