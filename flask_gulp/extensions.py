@@ -2,8 +2,6 @@ import os
 import subprocess
 from functools import wraps
 
-from . import File
-
 
 extensions = {}
 
@@ -34,7 +32,11 @@ def extension(f):
 def runner(command, f, ext):
     process = subprocess.Popen(command, stdin=subprocess.PIPE,
                                stdout=subprocess.PIPE, shell=True)
-    out, err = process.communicate(f.content)
+    if not f.content:
+        with open(f.filename) as fd:
+            out, err = process.communicate(fd.read())
+    else:
+        out, err = process.communicate(f.content)
 
     if process.returncode:
         return f._replace(filename=None, content=err)

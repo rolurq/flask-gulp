@@ -39,7 +39,7 @@ def wildcard(pattern):
             yield os.path.join(dirname, name), os.path.join(_1 or '', _2)
 
 
-def glob0(dirname, pattern):
+def glob0(dirname, basename):
     if not basename:
         if os.path.isdir(dirname):
             yield basename, None

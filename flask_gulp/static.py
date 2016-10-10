@@ -37,9 +37,8 @@ class Static(object):
                     markup += Markup('<!-- %s -->\n' % task)
                     markup += Markup('\n'.join(
                         (wrapper %
-                            url_for('static', filename=
-                                    os.path.relpath(item, root)
-                                    .replace('\\', '/'))
+                            url_for('static', filename=os.path
+                                    .relpath(item, root).replace('\\', '/'))
                             for item in self.tasks[task].items)))
                     markup += '\n'
                 return markup
