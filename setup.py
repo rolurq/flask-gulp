@@ -6,7 +6,7 @@ except ImportError:
 import flask_gulp
 
 
-readme = open('README').read()
+readme = open('README.rst').read()
 version = flask_gulp.__version__
 
 setup(name='Flask-Gulp', license='MIT License', author='Rolando Urquiza',

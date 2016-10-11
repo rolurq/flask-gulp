@@ -1,17 +1,14 @@
 from __future__ import print_function
 import os
 import sys
-from collections import namedtuple, OrderedDict
+from collections import OrderedDict
 
 from flask import url_for
 from jinja2 import Markup
 
-import wildcard
-from flask_gulp.extensions import extensions
-from flask_gulp.watcher import Watcher
-
-
-Task = namedtuple('Task', ['function', 'items', 'watched'])
+from . import wildcard, File, Task
+from .extensions import extensions
+from .watcher import Watcher
 
 
 class Static(object):
@@ -28,6 +25,7 @@ class Static(object):
         app.config.setdefault('STATIC_INITIAL_PATH', app.root_path)
         app.config.setdefault('STATIC_GENERATED_LINKS_PATH', app.static_folder)
         app.config.setdefault('STATIC_RUN_ON_REFRESH', False)
+        app.config.setdefault('STATIC_DEBUG', app.debug)
         self.app = app
 
         @app.context_processor
@@ -39,9 +37,8 @@ class Static(object):
                     markup += Markup('<!-- %s -->\n' % task)
                     markup += Markup('\n'.join(
                         (wrapper %
-                            url_for('static', filename=
-                                    os.path.relpath(item, root)
-                                    .replace('\\', '/'))
+                            url_for('static', filename=os.path
+                                    .relpath(item, root).replace('\\', '/'))
                             for item in self.tasks[task].items)))
                     markup += '\n'
                 return markup
@@ -100,9 +97,10 @@ class Static(object):
         for task in tasks:
             self.tasks[task] = self.tasks[task]._replace(watched=True)
 
-        watcher = Watcher(paths, self, tasks, debug=self.app.debug,
-                          interval=self.app.config.
-                          get('STATIC_WATCHER_INTERVAL'))
+        watcher = Watcher(paths, self, tasks,
+                          debug=self.app.config.get('STATIC_DEBUG'),
+                          interval=self.app.config
+                          .get('STATIC_WATCHER_INTERVAL'))
         self.run(*tasks)
         watcher.daemon = True
         watcher.start()
@@ -118,8 +116,8 @@ class Static(object):
 
     def __loadResources(self, *paths):
         res = StaticResources()
-        for filename in self.findFiles(*paths):
-            res.add(filename)
+        for filename, relativ in self.findFiles(*paths):
+            res.add(filename, relativ)
         return res
 
     def run(self, *tasks):
@@ -133,13 +131,13 @@ class Static(object):
             # extend function scope
             t.function.__globals__.update(extensions)
             t.function.__globals__['src'] = src
-            if self.app.debug:
+            if self.app.config.get('STATIC_DEBUG'):
                 print('[*] running %s...' % task)
             t.function()
             res.close()
-            self.tasks[task] = t._replace(items=[filename
-                                                 for filename, _ in res
-                                                 if filename])
+            self.tasks[task] = t._replace(items=[f.filename
+                                                 for f in res
+                                                 if f.filename])
             # retrieve normal scope
             del t.function.__globals__['src']
             for k in extensions:
@@ -165,16 +163,14 @@ class StaticResources(object):
 
     def close(self):
         self.resources = []
-        for dest, generated in self.gen:
-            if not dest and generated:
-                print(generated, file=sys.stderr)
+        for generated in self.gen:
+            if not generated.filename and generated.content:
+                print(generated.content, file=sys.stderr)
             else:
-                self.resources.append((dest, generated))
+                self.resources.append(generated)
 
-    def add(self, filename):
-        f = open(filename)
-        self.resources.append((filename, f.read()))
-        f.close()
+    def add(self, filename, rel):
+        self.resources.append(File(filename, rel, None))
 
     def __iter__(self):
         return iter(self.resources)
