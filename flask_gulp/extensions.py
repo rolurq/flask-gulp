@@ -88,7 +88,7 @@ def dest(resources):
     for f in resources:
         if f.filename:
             if output:
-                base, _ = os.path.split(f.rel_name)
+                base, _ = os.path.split(f.rel_name) if f.rel_name else ('', None)
                 # create the new file in the same relative path
                 dest_dir = os.path.join(output, base)
                 if not os.path.exists(dest_dir):
