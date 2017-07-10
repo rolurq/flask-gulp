@@ -33,7 +33,7 @@ def runner(command, f, ext):
     process = subprocess.Popen(command, stdin=subprocess.PIPE,
                                stdout=subprocess.PIPE, shell=True)
     if not f.content:
-        with open(f.filename) as fd:
+        with open(f.filename, 'rb') as fd:
             out, err = process.communicate(fd.read())
     else:
         out, err = process.communicate(f.content)
@@ -98,6 +98,6 @@ def dest(resources):
             else:
                 filename = f.filename
 
-            with open(filename, 'w') as fo:
+            with open(filename, 'wb') as fo:
                 fo.write(f.content)
             yield f._replace(filename=filename, content=None)
